@@ -10,6 +10,8 @@ import (
   "regexp"
   "crypto/md5"
   "time"
+
+  "./uploader"
 )
 
 const (
@@ -54,19 +56,10 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   imageName := extensionMatcher.ReplaceAllString(imageHeader.Filename, "")
 
   filetype := http.DetectContentType(firstImageBytes)
-  var extension string
-  switch filetype {
-    case "image/jpeg", "image/jpg":
-      extension = "jpg"
-    case "image/gif":
-      extension = "gif"
-    case "image/png":
-      extension = "png"
-    case "application/pdf":
-      extension = "pdf"
-    default:
-      fmt.Fprintf(w, "unknown filetype: %v", filetype)
-      return
+  extension, err := uploader.FileExtension(filetype)
+  if err != nil {
+    fmt.Fprintf(w, "error: %v: %s", err, filetype)
+    return
   }
 
   uploadFilePath := fmt.Sprintf("%v%x-%v.%v", StorageDirectory, md5Checksum, imageName, extension)
