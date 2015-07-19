@@ -5,7 +5,6 @@ import (
   "net/http"
   "io"
   "os"
-  "encoding/json"
   "strings"
   _ "regexp"
   _ "crypto/md5"
@@ -23,12 +22,6 @@ const (
   ImagePath = "/image/"
 )
 
-type Image struct {
-    Link     string `json:"link"`
-    Filename string `json:"filename"`
-    Time     int64
-}
-
 func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   if r.Method != "POST" {
     uploader.PrintJsonErrorString(&w, "use POST method for upload!", r.Method)
@@ -42,7 +35,8 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   }
   defer imageFile.Close()
 
-  uploadFilePath, err, errorSubject := uploader.BuildFilePath(&imageFile, StorageDirectory, imageHeader.Filename)
+  imageFileName := imageHeader.Filename
+  uploadFilePath, err, errorSubject := uploader.BuildFilePath(&imageFile, StorageDirectory, imageFileName)
   if err != nil {
     uploader.PrintJsonErrorDetails(&w, err, errorSubject)
     return
@@ -65,10 +59,9 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   link := strings.Replace(uploadFilePath, StorageDirectory, imageResourceUrl, 1)
   timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 
-  image := Image { link, imageHeader.Filename, timestamp }
-  jsonBytes, _ := json.Marshal(image)
+  image := uploader.Image { link, imageFileName, timestamp }
 
-  fmt.Fprint(w, string(jsonBytes))
+  fmt.Fprint(w, (&image).Json())
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {
