@@ -12,6 +12,15 @@ import (
   "time"
 )
 
+const (
+  DefaultPort = ":8080"
+  Protocol = "http://"
+
+  StorageDirectory = "./uploads/"
+
+  ImagePath = "/image/"
+)
+
 type Image struct {
     Link     string `json:"link"`
     Filename string `json:"filename"`
@@ -60,7 +69,7 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
       return
   }
 
-  uploadFilePath := fmt.Sprintf("%v%x-%v.%v", storage_directory, md5Checksum, imageName, extension)
+  uploadFilePath := fmt.Sprintf("%v%x-%v.%v", StorageDirectory, md5Checksum, imageName, extension)
   uploadedFile, err := os.Create(uploadFilePath)
   if err != nil {
     fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege for path: %v", uploadFilePath)
@@ -75,8 +84,8 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  imageResourceUrl := fmt.Sprint(protocol, r.Host, image_path)
-  link := strings.Replace(uploadFilePath, storage_directory, imageResourceUrl, 1)
+  imageResourceUrl := fmt.Sprint(Protocol, r.Host, ImagePath)
+  link := strings.Replace(uploadFilePath, StorageDirectory, imageResourceUrl, 1)
   timestamp := time.Now().UnixNano() / int64(time.Millisecond)
   image := Image { link, imageHeader.Filename, timestamp }
 
@@ -86,7 +95,7 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {
-  filePath := strings.Replace(r.URL.Path, image_path, storage_directory, 1)
+  filePath := strings.Replace(r.URL.Path, ImagePath, StorageDirectory, 1)
   http.ServeFile(w, r, filePath)
 }
 
@@ -94,23 +103,14 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprint(w, "ok")
 }
 
-const (
-  default_port = ":8080"
-  protocol = "http://"
-
-  storage_directory = "./uploads/"
-
-  image_path = "/image/"
-)
-
 func main() {
   http.HandleFunc("/upload/", saveImageHandler)
-  http.HandleFunc(image_path, showImageHandler)
+  http.HandleFunc(ImagePath, showImageHandler)
   http.HandleFunc("/ping", statusHandler)
 
-  var port = default_port
-  if env_port := os.Getenv("APP_PORT"); env_port != ""  {
-    port = fmt.Sprint(":", env_port)
+  var port = DefaultPort
+  if envPort := os.Getenv("APP_PORT"); envPort != ""  {
+    port = fmt.Sprint(":", envPort)
   }
 
   fmt.Printf("Server running on port: %v...", port)
