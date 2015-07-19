@@ -7,8 +7,8 @@ import (
   "os"
   "encoding/json"
   "strings"
-  "regexp"
-  "crypto/md5"
+  _ "regexp"
+  _ "crypto/md5"
   "time"
 
   "./uploader"
@@ -42,26 +42,12 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   }
   defer imageFile.Close()
 
-  firstImageBytes := make([]byte, 512) // why 512 bytes ? see http://golang.org/pkg/net/http/#DetectContentType
-  _, err = imageFile.Read(firstImageBytes)
+  uploadFilePath, err, errorSubject := uploader.BuildFilePath(&imageFile, StorageDirectory, imageHeader.Filename)
   if err != nil {
-    uploader.PrintJsonError(&w, "Cannot read file", err)
+    uploader.PrintJsonErrorDetails(&w, err, errorSubject)
     return
   }
 
-  md5Checksum := md5.Sum(firstImageBytes)
-
-  extensionMatcher := regexp.MustCompile("\\.\\w+$")
-  imageName := extensionMatcher.ReplaceAllString(imageHeader.Filename, "")
-
-  filetype := http.DetectContentType(firstImageBytes)
-  extension, err := uploader.FileExtension(filetype)
-  if err != nil {
-    uploader.PrintJsonErrorDetails(&w, err, filetype)
-    return
-  }
-
-  uploadFilePath := fmt.Sprintf("%v%x-%v.%v", StorageDirectory, md5Checksum, imageName, extension)
   uploadedFile, err := os.Create(uploadFilePath)
   if err != nil {
     uploader.PrintJsonErrorDetails(&w, err, uploadFilePath)
@@ -69,7 +55,6 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
    }
   defer uploadedFile.Close()
 
-  imageFile.Seek(0, 0) // because we have already read first 512 bytes
   _, err = io.Copy(uploadedFile, imageFile)
   if err != nil {
     uploader.PrintJsonErrorDetails(&w, err, uploadFilePath)
