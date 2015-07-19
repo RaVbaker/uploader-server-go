@@ -31,7 +31,7 @@ type Image struct {
 
 func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   if r.Method != "POST" {
-    fmt.Fprintf(w, "use POST method for upload!")
+    uploader.PrintJsonErrorString(&w, "use POST method for upload!", r.Method)
     return
   }
 
@@ -39,14 +39,14 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   defer imageFile.Close()
 
   if err != nil {
-    fmt.Fprintf(w, "error: %v", err)
+    uploader.PrintJsonError(&w, "Cannot fetch file from form field(image)", err)
     return
   }
 
   firstImageBytes := make([]byte, 512) // why 512 bytes ? see http://golang.org/pkg/net/http/#DetectContentType
   _, err = imageFile.Read(firstImageBytes)
   if err != nil {
-    fmt.Fprintf(w, "error: ", err)
+    uploader.PrintJsonError(&w, "Cannot read file", err)
     return
   }
 
@@ -58,14 +58,14 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   filetype := http.DetectContentType(firstImageBytes)
   extension, err := uploader.FileExtension(filetype)
   if err != nil {
-    fmt.Fprintf(w, "error: %v: %s", err, filetype)
+    uploader.PrintJsonErrorDetails(&w, err, filetype)
     return
   }
 
   uploadFilePath := fmt.Sprintf("%v%x-%v.%v", StorageDirectory, md5Checksum, imageName, extension)
   uploadedFile, err := os.Create(uploadFilePath)
   if err != nil {
-    fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege for path: %v", uploadFilePath)
+    uploader.PrintJsonErrorDetails(&w, err, uploadFilePath)
     return
    }
   defer uploadedFile.Close()
@@ -73,7 +73,7 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   imageFile.Seek(0, 0) // because we have already read first 512 bytes
   _, err = io.Copy(uploadedFile, imageFile)
   if err != nil {
-    fmt.Fprintf(w, "filesave error: %v", err)
+    uploader.PrintJsonErrorDetails(&w, err, uploadFilePath)
     return
   }
 
@@ -84,7 +84,7 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 
   jsonBytes, _ := json.Marshal(image)
 
-  fmt.Fprintf(w, string(jsonBytes))
+  fmt.Fprint(w, string(jsonBytes))
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,8 @@
 package uploader
 
-import "errors"
+import (
+  "errors"
+)
 
 var (
   unknownFiletype = errors.New("unknown filetype")
