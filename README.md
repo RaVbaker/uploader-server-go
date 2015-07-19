@@ -2,13 +2,26 @@
 First project in Go for https://github.com/czak/uploader app
 
 
-# starting
+## starting
 
 Install [go](https://go-lang.org) & run command:
 
     go run uploader.go
 
-# testing
+### starting with Docker
+
+    docker build -t uploader-server-go .
+    docker run -d -p 8080:8080 --name uploader-server uploader-server-go
+
+To rebuild updated docker app (when local code changes) and running it in-place:
+
+    docker rmi uploader-server-go
+    docker build -t uploader-server-go .
+    docker run --rm -p 8080:8080 --name uploader-server uploader-server-go
+
+Stopping by `^C` is equal to: `docker stop uploader-server && docker rm uploader-server` on deamonized version.
+
+## testing
 
 Use this `curl` for uploading sample:
 
@@ -28,7 +41,7 @@ To examinate upload use command and see your image in browser.
     open http://localhost:8080/image/ba682fcc5026599799eaf72cf9ee23fc-sample.png
 
 
-# configuring
+## configuring
 
 Server port can be configured with ENV variable $APP_PORT. To start a server on diffrent port than default (`8080`), try command like this:
 
