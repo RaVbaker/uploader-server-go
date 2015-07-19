@@ -36,12 +36,11 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   }
 
   imageFile, imageHeader, err := r.FormFile("image")
-  defer imageFile.Close()
-
   if err != nil {
     uploader.PrintJsonError(&w, "Cannot fetch file from form field(image)", err)
     return
   }
+  defer imageFile.Close()
 
   firstImageBytes := make([]byte, 512) // why 512 bytes ? see http://golang.org/pkg/net/http/#DetectContentType
   _, err = imageFile.Read(firstImageBytes)
@@ -80,8 +79,8 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
   imageResourceUrl := fmt.Sprint(Protocol, r.Host, ImagePath)
   link := strings.Replace(uploadFilePath, StorageDirectory, imageResourceUrl, 1)
   timestamp := time.Now().UnixNano() / int64(time.Millisecond)
-  image := Image { link, imageHeader.Filename, timestamp }
 
+  image := Image { link, imageHeader.Filename, timestamp }
   jsonBytes, _ := json.Marshal(image)
 
   fmt.Fprint(w, string(jsonBytes))
