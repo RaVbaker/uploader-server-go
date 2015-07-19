@@ -6,6 +6,13 @@ First project in Go for https://github.com/czak/uploader app
 
 Install [go](https://go-lang.org) & run command: `go run uploader.go`
 
+# starting with Docker
+
+```
+docker build -t uploader-server-go .
+docker run -d -p 8080:8080 --name uploader-server uploader-server-go
+```
+
 # testing:
 
 Use this `curl` for uploading sample:
