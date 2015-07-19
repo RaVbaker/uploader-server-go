@@ -60,10 +60,10 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
       return
   }
 
-  uploadFilePath := fmt.Sprintf("./uploads/%x-%v.%v", md5Checksum, imageName, extension)
+  uploadFilePath := fmt.Sprintf("%v%x-%v.%v", storage_directory, md5Checksum, imageName, extension)
   uploadedFile, err := os.Create(uploadFilePath)
   if err != nil {
-    fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
+    fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege for path: %v", uploadFilePath)
     return
    }
   defer uploadedFile.Close()
@@ -75,7 +75,8 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  link := strings.Replace(uploadFilePath, "./uploads/", "http://localhost:8080/image/", 1)
+  imageResourceUrl := fmt.Sprint(protocol, r.Host, image_path)
+  link := strings.Replace(uploadFilePath, storage_directory, imageResourceUrl, 1)
   timestamp := time.Now().UnixNano() / int64(time.Millisecond)
   image := Image { link, imageHeader.Filename, timestamp }
 
@@ -85,7 +86,7 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {
-  filePath := strings.Replace(r.URL.Path, "/image/", "./uploads/", 1)
+  filePath := strings.Replace(r.URL.Path, image_path, storage_directory, 1)
   http.ServeFile(w, r, filePath)
 }
 
@@ -93,11 +94,25 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
   fmt.Fprint(w, "ok")
 }
 
+const (
+  default_port = ":8080"
+  protocol = "http://"
+
+  storage_directory = "./uploads/"
+
+  image_path = "/image/"
+)
+
 func main() {
-  var port = ":8080"
   http.HandleFunc("/upload/", saveImageHandler)
-  http.HandleFunc("/image/", showImageHandler)
+  http.HandleFunc(image_path, showImageHandler)
   http.HandleFunc("/ping", statusHandler)
+
+  var port = default_port
+  if env_port := os.Getenv("APP_PORT"); env_port != ""  {
+    port = fmt.Sprint(":", env_port)
+  }
+
   fmt.Printf("Server running on port: %v...", port)
   http.ListenAndServe(port, nil)
 }
