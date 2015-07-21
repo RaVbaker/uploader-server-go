@@ -1,12 +1,12 @@
 package uploader
 
 import (
-	"errors"
-	"regexp"
-	mimeMultipart "mime/multipart"
 	"crypto/md5"
-	"net/http"
+	"errors"
 	"fmt"
+	mimeMultipart "mime/multipart"
+	"net/http"
+	"regexp"
 )
 
 var (

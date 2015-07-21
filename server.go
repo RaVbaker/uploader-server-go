@@ -1,12 +1,12 @@
 package main
 
 import (
-	_ "time"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
+	_ "time"
 
 	"github.com/ravbaker/uploader-server-go/uploader"
 )

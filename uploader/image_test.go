@@ -1,8 +1,8 @@
 package uploader
 
 import (
-  "testing"
-  "fmt"
+	"fmt"
+	"testing"
 )
 
 func TestJsonResponse(t *testing.T) {
@@ -15,17 +15,17 @@ func TestJsonResponse(t *testing.T) {
 }
 
 func TestNewImageCreation(t *testing.T) {
-  link, filename := "url", "sample.jpg"
-  image := NewImage(link, filename)
-  if fmt.Sprintf("%T", image) != "*uploader.Image" {
-    t.Fatal("It should return an image")
-  }
+	link, filename := "url", "sample.jpg"
+	image := NewImage(link, filename)
+	if fmt.Sprintf("%T", image) != "*uploader.Image" {
+		t.Fatal("It should return an image")
+	}
 
-  if image.Link != link {
-   t.Errorf("image.Link(%v) is not equal to expected value: %v", image.Link, link)
-  }
+	if image.Link != link {
+		t.Errorf("image.Link(%v) is not equal to expected value: %v", image.Link, link)
+	}
 
-  if image.Filename != filename {
-   t.Errorf("image.Filename(%v) is not equal to expected value: %v", image.Filename, filename)
-  }
+	if image.Filename != filename {
+		t.Errorf("image.Filename(%v) is not equal to expected value: %v", image.Filename, filename)
+	}
 }

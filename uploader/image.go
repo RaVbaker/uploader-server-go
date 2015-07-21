@@ -1,8 +1,8 @@
 package uploader
 
 import (
-  "encoding/json"
-  "time"
+	"encoding/json"
+	"time"
 )
 
 type Image struct {
@@ -18,7 +18,7 @@ func (image *Image) Json() string {
 }
 
 func NewImage(link, filename string) *Image {
-  timestamp := time.Now().Unix()
+	timestamp := time.Now().Unix()
 
-  return &Image{link, filename, timestamp}
+	return &Image{link, filename, timestamp}
 }
