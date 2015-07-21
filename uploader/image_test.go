@@ -1,7 +1,8 @@
 package uploader
 
 import (
-	"testing"
+  "testing"
+  "fmt"
 )
 
 func TestJsonResponse(t *testing.T) {
@@ -11,4 +12,20 @@ func TestJsonResponse(t *testing.T) {
 	if jsonResponse != expectedJsonResponse {
 		t.Errorf("Json response doesn't match requred pattern: '%v' expected: '%v'", jsonResponse, expectedJsonResponse)
 	}
+}
+
+func TestNewImageCreation(t *testing.T) {
+  link, filename := "url", "sample.jpg"
+  image := NewImage(link, filename)
+  if fmt.Sprintf("%T", image) != "*uploader.Image" {
+    t.Fatal("It should return an image")
+  }
+
+  if image.Link != link {
+   t.Errorf("image.Link(%v) is not equal to expected value: %v", image.Link, link)
+  }
+
+  if image.Filename != filename {
+   t.Errorf("image.Filename(%v) is not equal to expected value: %v", image.Filename, filename)
+  }
 }

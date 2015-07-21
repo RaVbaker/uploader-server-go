@@ -1,12 +1,12 @@
 package uploader
 
 import (
-	"crypto/md5"
 	"errors"
-	"fmt"
-	"mime/multipart"
-	"net/http"
 	"regexp"
+	mimeMultipart "mime/multipart"
+	"crypto/md5"
+	"net/http"
+	"fmt"
 )
 
 var (
@@ -34,7 +34,7 @@ func filenameWithoutExtension(filename string) string {
 	return extensionMatcher.ReplaceAllString(filename, "")
 }
 
-func BuildFilePath(file *multipart.File, StorageDirectory string, filename string) (string, error, string) {
+func BuildFilePath(file *mimeMultipart.File, StorageDirectory string, filename string) (string, error, string) {
 	firstBytes := make([]byte, 512) // why 512 bytes ? see http://golang.org/pkg/net/http/#DetectContentType
 	_, err := (*file).Read(firstBytes)
 	if err != nil {
