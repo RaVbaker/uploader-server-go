@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"./uploader"
+	"github.com/ravbaker/uploader-server-go/uploader"
 )
 
 const (

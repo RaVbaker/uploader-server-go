@@ -6,7 +6,7 @@ First project in Go for https://github.com/czak/uploader app
 
 Install [go](https://go-lang.org) & run command:
 
-    go run uploader.go
+    go run server.go
 
 ### starting with Docker
 
@@ -45,7 +45,7 @@ To examinate upload use command and see your image in browser.
 
 Server port can be configured with ENV variable $APP_PORT. To start a server on diffrent port than default (`8080`), try command like this:
 
-    APP_PORT=9090 go run uploader.go
+    APP_PORT=9090 go run server.go
 
 ----
 
