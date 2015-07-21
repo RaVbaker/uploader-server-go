@@ -2,7 +2,6 @@ package uploader
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -18,8 +17,8 @@ func (e *UploadError) Error() string {
 
 func (e *UploadError) Json() string {
 	if e.When == 0 {
-		e.When = time.Now().UnixNano() / int64(time.Millisecond)
+		e.When = time.Now().Unix()
 	}
 	jsonBytes, _ := json.Marshal(e)
-	return fmt.Sprintf("%s", jsonBytes)
+	return string(jsonBytes)
 }
