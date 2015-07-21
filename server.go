@@ -1,14 +1,12 @@
 package main
 
 import (
-	_ "crypto/md5"
+	_ "time"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	_ "regexp"
 	"strings"
-	"time"
 
 	"github.com/ravbaker/uploader-server-go/uploader"
 )
@@ -57,11 +55,9 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	imageResourceUrl := fmt.Sprint(Protocol, r.Host, ImagePath)
 	link := strings.Replace(uploadFilePath, StorageDirectory, imageResourceUrl, 1)
-	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
 
-	image := uploader.Image{link, imageFileName, timestamp}
-
-	fmt.Fprint(w, (&image).Json())
+	image := uploader.NewImage(link, imageFileName)
+	fmt.Fprint(w, image.Json())
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {
