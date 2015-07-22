@@ -63,6 +63,8 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 
 	image := uploader.NewImage(link, imageFileName)
 	go uploader.SaveImage(image)
+
+	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprint(w, image.Json())
 }
 
@@ -84,6 +86,7 @@ func listImagesHandler(w http.ResponseWriter, r *http.Request) {
 		jsonResponse = "[]" // empty response
 	}
 
+	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprint(w, jsonResponse)
 }
 
