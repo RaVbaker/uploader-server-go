@@ -7,8 +7,7 @@ import (
 	"os"
 	"strings"
 	_ "time"
-
-	_ "./uploader" // use this import and put _ before next line
+	// "./uploader" // use this import and put _ before next line
 	"github.com/ravbaker/uploader-server-go/uploader"
 )
 

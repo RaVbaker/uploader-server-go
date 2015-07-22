@@ -41,6 +41,8 @@ To examinate upload use command and see your image in browser.
     open http://localhost:8080/image/ba682fcc5026599799eaf72cf9ee23fc-sample.png
 
 
+    curl -i  http://localhost:8080/images/
+
 ## configuring
 
 Server port can be configured with ENV variable $APP_PORT. To start a server on diffrent port than default (`8080`), try command like this:
