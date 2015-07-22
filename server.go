@@ -21,6 +21,10 @@ const (
 	ImagePath = "/image/"
 )
 
+func statusHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "ok")
+}
+
 func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		uploader.PrintJsonErrorString(&w, "use POST method for upload!", r.Method)
@@ -83,15 +87,11 @@ func listImagesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, jsonResponse)
 }
 
-func statusHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "ok")
-}
-
 func main() {
+	http.HandleFunc("/ping", statusHandler)
 	http.HandleFunc("/upload/", saveImageHandler)
 	http.HandleFunc(ImagePath, showImageHandler)
 	http.HandleFunc("/images", listImagesHandler)
-	http.HandleFunc("/ping", statusHandler)
 
 	var port = DefaultPort
 	if envPort := os.Getenv("APP_PORT"); envPort != "" {
