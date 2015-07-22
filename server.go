@@ -8,6 +8,7 @@ import (
 	"strings"
 	_ "time"
 
+	_ "./uploader" // use this import and put _ before next line
 	"github.com/ravbaker/uploader-server-go/uploader"
 )
 
@@ -57,12 +58,29 @@ func saveImageHandler(w http.ResponseWriter, r *http.Request) {
 	link := strings.Replace(uploadFilePath, StorageDirectory, imageResourceUrl, 1)
 
 	image := uploader.NewImage(link, imageFileName)
+	go uploader.SaveImage(image)
 	fmt.Fprint(w, image.Json())
 }
 
 func showImageHandler(w http.ResponseWriter, r *http.Request) {
 	filePath := strings.Replace(r.URL.Path, ImagePath, StorageDirectory, 1)
 	http.ServeFile(w, r, filePath)
+}
+
+func listImagesHandler(w http.ResponseWriter, r *http.Request) {
+	var jsonResponse string
+
+	for image := range uploader.Images.Iter() {
+		jsonResponse = fmt.Sprint(jsonResponse, ",", image.Json())
+	}
+
+	if len(jsonResponse) > 0 {
+		jsonResponse = fmt.Sprint("[", jsonResponse[1:], "]")
+	} else {
+		jsonResponse = "[]" // empty response
+	}
+
+	fmt.Fprint(w, jsonResponse)
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +90,7 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/upload/", saveImageHandler)
 	http.HandleFunc(ImagePath, showImageHandler)
+	http.HandleFunc("/images", listImagesHandler)
 	http.HandleFunc("/ping", statusHandler)
 
 	var port = DefaultPort
